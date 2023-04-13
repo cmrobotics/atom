@@ -26,6 +26,7 @@ import networkx as nx
 # local packages
 from atom_core.utilities import checkDirectoryExistence
 from atom_core.naming import generateLabeledTopic
+from atom_core.rosbag2 import is_rosbag2, convert_rosbag2_to_rosbag1
 from colorama import Style, Fore
 from graphviz import Digraph
 from urdf_parser_py.urdf import URDF
@@ -122,6 +123,17 @@ if __name__ == "__main__":
     # Read the bag file
     # --------------------------------------------------------------------------
     bag_file, _, bag_file_rel = atom_core.config_io.uriReader(config['bag_file'])
+    if is_rosbag2(bag_file):
+        print(f"{bag_file} is a rosbag2 file. Converting to rosbag1 format")
+        rosbag2_file = convert_rosbag2_to_rosbag1(bag_file)
+        if rosbag2_file:
+            print("Converted successfully, destination file: " + rosbag2_file)
+            bag_file = rosbag2_file
+            bag_file_rel = bag_file
+        else:
+            print('Error converting rosbag2 to rosbag1')
+            exit(1)
+
     print('Loading bagfile ' + bag_file)
     bag = rosbag.Bag(bag_file)
     bag_info = bag.get_type_and_topic_info()

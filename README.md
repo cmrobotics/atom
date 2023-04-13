@@ -12,6 +12,8 @@ A Calibration Framework using the <br><strong><span style="font-size: large">A</
 <!-- Font sizes here -->
 <!-- https://www.freecodecamp.org/news/html-font-size-how-to-change-text-size-using-inline-css-style/ -->
 
+> **NOTE:** for that fork to work properly, `rosbags` library from [here](https://github.com/cmrobotics/rosbags) is required.
+
 **ATOM** is a set of calibration tools for multi-sensor, multi-modal, robotic systems, based on the optimization of atomic transformations as provided by a [ROS](https://www.ros.org/) based robot description. Moreover, **ATOM** provides several scripts to facilitate all the steps of a calibration procedure.
 
 For instructions on how to install and use, **check the documentation**:
