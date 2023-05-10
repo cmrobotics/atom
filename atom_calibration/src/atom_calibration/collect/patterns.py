@@ -84,6 +84,7 @@ class CharucoPattern(object):
         self.board = cv2.aruco.CharucoBoard_create(size["x"] + 1, size["y"] + 1, length, marker_length, self.dictionary)
         print(self.board)
 
+        self.min_number_of_corners = 10
     def detect(self, image, equalize_histogram=False):
 
         if len(image.shape) == 3:  # convert to gray if it is an rgb image
@@ -103,18 +104,18 @@ class CharucoPattern(object):
         # print('Line 98')
 
         # setup initial data
-        params.adaptiveThreshConstant = 2
-        # params.adaptiveThreshWinSizeMin = 3
-        # params.adaptiveThreshWinSizeMax = 10
-        # params.adaptiveThreshWinSizeStep = 5
-        params.minMarkerPerimeterRate = 0.003
-        params.maxMarkerPerimeterRate = 4
-        params.minCornerDistanceRate = 0.1
-        params.markerBorderBits = 1
-        params.minOtsuStdDev = 15
-        params.perspectiveRemoveIgnoredMarginPerCell = .1
-        params.maxErroneousBitsInBorderRate = .15
-        params.errorCorrectionRate = .6
+        # params.adaptiveThreshConstant = 2
+        # # params.adaptiveThreshWinSizeMin = 3
+        # # params.adaptiveThreshWinSizeMax = 10
+        # # params.adaptiveThreshWinSizeStep = 5
+        # params.minMarkerPerimeterRate = 0.003
+        # params.maxMarkerPerimeterRate = 4
+        # params.minCornerDistanceRate = 0.1
+        # params.markerBorderBits = 1
+        # params.minOtsuStdDev = 15
+        # params.perspectiveRemoveIgnoredMarginPerCell = .1
+        # params.maxErroneousBitsInBorderRate = .15
+        # params.errorCorrectionRate = .6
 
         # param.doCornerRefinement = False
 
@@ -124,15 +125,15 @@ class CharucoPattern(object):
         corners, ids, rejected, _ = cv2.aruco.refineDetectedMarkers(gray, self.board, corners, ids, rejected)
 
         if len(corners) > 4:
-            ret, ccorners, cids = cv2.aruco.interpolateCornersCharuco(corners, ids, gray, self.board)
+            ret, ccorners, cids = cv2.aruco.interpolateCornersCharuco(corners, ids, gray, self.board, minMarkers=1)
 
             criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 500, 0.0001)
             # TODO is it 5x5 or 3x3 ...
             # Commented this because it return error in more recent opencv versions
-            # ccorners = cv2.cornerSubPix(gray, ccorners, (5, 5), (-1, -1), criteria)
+            ccorners = cv2.cornerSubPix(gray, ccorners, (5, 5), (-1, -1), criteria)
 
             # A valid detection must have at least 25% of the total number of corners.
-            detected = ccorners is not None and len(ccorners) > self.number_of_corners / 4
+            detected = ccorners is not None and len(ccorners) > self.min_number_of_corners
             if detected:
                 return {'detected': detected, 'keypoints': ccorners, 'ids': cids.ravel().tolist()}
 
