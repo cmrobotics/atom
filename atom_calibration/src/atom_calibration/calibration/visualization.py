@@ -645,6 +645,9 @@ def visualizationFunction(models):
     # ---------------------------------------------------------------------------------
     # Publish 2D labels
     # ---------------------------------------------------------------------------------
+    
+    # visualization of image frustum coverage by pattern detections
+    frustum_images = {}
     for collection_key, collection in collections.items():
         for sensor_key, sensor in sensors.items():
             if not collection['labels'][sensor_key]['detected']:  # not detected by sensor in collection
@@ -653,17 +656,26 @@ def visualizationFunction(models):
             # if sensor['msg_type'] == 'Image':
             if sensor['modality'] == 'rgb':
                 if args['show_images']:
+                    draw_pattern_coverage = not os.path.exists(f"/home/rosnoetic/calib_ws/frustum_coverage_{sensor_key}.png")
+
+
                     image = copy.deepcopy(getCvImageFromCollectionSensor(collection_key, sensor_key, dataset))
                     width = collection['data'][sensor_key]['width']
                     height = collection['data'][sensor_key]['height']
                     diagonal = math.sqrt(width ** 2 + height ** 2)
                     cm = graphics['pattern']['colormap']
 
+                    if draw_pattern_coverage and sensor_key not in frustum_images:
+                        frustum_images[sensor_key] = np.zeros_like(image)
+
                     # Draw projected points (as dots)
                     for idx, point in enumerate(collection['labels'][sensor_key]['idxs_projected']):
                         x = int(round(point['x']))
                         y = int(round(point['y']))
                         color = (cm[idx, 2] * 255, cm[idx, 1] * 255, cm[idx, 0] * 255)
+                        if abs(x) > 10000 or abs(y) > 10000:
+                            print(f"{collection_key} - {sensor_key} - {(x,y)}")
+                            continue
                         cv2.line(image, (x, y), (x, y), color, int(6E-3 * diagonal))
 
                     # Draw ground truth points (as squares)
@@ -672,6 +684,9 @@ def visualizationFunction(models):
                         y = int(round(point['y']))
                         color = (cm[idx, 2] * 255, cm[idx, 1] * 255, cm[idx, 0] * 255)
                         drawSquare2D(image, x, y, int(8E-3 * diagonal), color=color, thickness=2)
+
+                        if draw_pattern_coverage:
+                            drawSquare2D(frustum_images[sensor_key], x, y, int(8E-3 * diagonal), color=color, thickness=2)
 
                     # Draw initial projected points (as crosses)
                     for idx, point in enumerate(collection['labels'][sensor_key]['idxs_initial']):
@@ -740,5 +755,9 @@ def visualizationFunction(models):
                 camera_info_msg.header.frame_id = msg.header.frame_id
                 graphics['collections'][collection_key][sensor_key]['publisher_camera_info'].publish(
                     camera_info_msg)
+            
+            if draw_pattern_coverage:
+                for sensor_key in frustum_images:
+                    cv2.imwrite(f"/home/ros1/calib_ws/frustums/frustum_coverage_{sensor_key}.png", frustum_images[sensor_key])
 
     graphics['ros']['Rate'].sleep()
