@@ -393,6 +393,17 @@ class DataCollectorAndLabeler:
         all_frames = list(frames_dict.keys())
 
         for frame in all_frames:
+            # when we record data, we may not have map to odom tf, thy some static transform maybe 
+            # unavailable, so we exclude them here
+            if(frame.startswith("feature")): continue
+
+            if(frame.startswith("warehouse")): continue
+
+            if(frame.startswith("zone")): continue
+
+            if(frame.startswith("charge")): continue
+
+
             print('Waiting for transformation from ' + frame + ' to ' + self.world_link + '(max 3 secs)')
             try:
                 self.listener.waitForTransform(frame, self.world_link, now, rospy.Duration(3))
