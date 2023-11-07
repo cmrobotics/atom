@@ -352,6 +352,11 @@ if __name__ == "__main__":
                 y_errors.append(abs(y_t - y_s_proj_to_t))
                 rms_errors.append(math.sqrt((x_t - x_s_proj_to_t)**2 + (y_t - y_s_proj_to_t)**2))
                 continue
+        
+        if len(x_errors) == 0:
+            e.pop(collection_key)
+
+            continue
 
         e[collection_key]['x'] = np.average(x_errors)
         e[collection_key]['y'] = np.average(y_errors)
@@ -463,7 +468,7 @@ if __name__ == "__main__":
     table_to_save = PrettyTable(table_header) # table to save. This table was created, because the original has colors and the output csv save them as random characters
 
     od = OrderedDict(sorted(test_dataset['collections'].items(), key=lambda t: int(t[0])))
-    for collection_key, collection in od.items():
+    for collection_key, collection in e.items():
         row = [collection_key,
                '%.4f' % e[collection_key]['rms'],
                '%.4f' % e[collection_key]['x'],

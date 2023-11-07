@@ -385,6 +385,8 @@ def setupVisualization(dataset, args, selected_collection_key):
     immovable_links = []
     movable_links = []
     for link in xml_robot.links:  # cycle all links
+        if link.name in ["right_wheel_link", "left_wheel_link", "actuator_magnet_link"]:
+            continue
 
         # print(dataset['calibration_config']['world_link'] + ' to ' + link.name + ':')
         first_time = True
@@ -673,9 +675,9 @@ def visualizationFunction(models):
                         x = int(round(point['x']))
                         y = int(round(point['y']))
                         color = (cm[idx, 2] * 255, cm[idx, 1] * 255, cm[idx, 0] * 255)
-                        if abs(x) > 10000 or abs(y) > 10000:
-                            print(f"{collection_key} - {sensor_key} - {(x,y)}")
-                            continue
+                        # if abs(x) > 10000 or abs(y) > 10000:
+                        #     print(f"{collection_key} - {sensor_key} - {(x,y)}")
+                        #     continue
                         cv2.line(image, (x, y), (x, y), color, int(6E-3 * diagonal))
 
                     # Draw ground truth points (as squares)
