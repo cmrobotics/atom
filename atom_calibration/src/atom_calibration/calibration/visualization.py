@@ -675,9 +675,6 @@ def visualizationFunction(models):
                         x = int(round(point['x']))
                         y = int(round(point['y']))
                         color = (cm[idx, 2] * 255, cm[idx, 1] * 255, cm[idx, 0] * 255)
-                        # if abs(x) > 10000 or abs(y) > 10000:
-                        #     print(f"{collection_key} - {sensor_key} - {(x,y)}")
-                        #     continue
                         cv2.line(image, (x, y), (x, y), color, int(6E-3 * diagonal))
 
                     # Draw ground truth points (as squares)
