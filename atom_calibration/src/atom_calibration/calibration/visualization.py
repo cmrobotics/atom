@@ -658,7 +658,7 @@ def visualizationFunction(models):
             # if sensor['msg_type'] == 'Image':
             if sensor['modality'] == 'rgb':
                 if args['show_images']:
-                    draw_pattern_coverage = not os.path.exists(f"/home/rosnoetic/calib_ws/frustum_coverage_{sensor_key}.png")
+                    draw_pattern_coverage = not os.path.exists(f"/home/ros1/calib_ws/frustum_coverage_{sensor_key}.png")
 
 
                     image = copy.deepcopy(getCvImageFromCollectionSensor(collection_key, sensor_key, dataset))
