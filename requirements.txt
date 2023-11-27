@@ -15,6 +15,9 @@ readchar
 urdf-parser-py
 SQLAlchemy
 open3d
+numpy>=1.20.3
+pyyaml>=5.4.1
+pytictoc
 
 
 
